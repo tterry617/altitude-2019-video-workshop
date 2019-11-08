@@ -29,7 +29,7 @@ Fastly documentation:
 In order to ease usage of the API, let's set a few environment variables for our API key and your personal service ID.
 
 ````
-API Key: f808dc1810f158b04ae06caf6e91df3e
+API Key: xZ8F-XZdRWiOBnu7Cy4QuVn5cEECSPOP
 ````
 
 Grab the API key from the readme above, and your service ID from the sheet given to you at the beginning of this workshop (this is assuming a Bash shell):
