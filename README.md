@@ -107,14 +107,14 @@ You should see a response like this:
 
 ### Step 2: Configure logging endpoint
 
-In this repo you will find a file `logging-log_format.txt`. This is a list of variables we will ne sending to our logging endpoint. We will be url encoding these and uploading them to the Fastly logging API.
+In this repo you will find a file `log_format.txt`. This is a list of variables we will ne sending to our logging endpoint. We will be url encoding these and uploading them to the Fastly logging API.
 
 We are working with Sumo Logic for this workshop, you can use any logging endpoint we support to suit your needs.
 
 In the directory of your git repo, run the following command to configure your real time logs:
 
 ````
-curl -X POST https://api.fastly.com/service/${SERVICE_ID}/version/2/logging/sumologic -H "Fastly-Key: ${API_KEY}" -d@logging-log_format.txt | jq
+curl -X POST https://api.fastly.com/service/${SERVICE_ID}/version/2/logging/sumologic -H "Fastly-Key: ${API_KEY}" -d@log_format.txt | jq
 ````
 
 Sample response:
@@ -153,9 +153,9 @@ In this repo there is included a `main.vcl` file which is our base config. In ea
   ############################################
 ````
 
-There is also a folder called `workshop-1` which contains our configurations for  logging. 
+There is also a folder called `workshop-1` which contains our configurations for logging. 
 
-Add the contents from `logging-vcl_recv.vcl` from this directory in your repo into this section. It should look lik this at the end:
+Add the contents from `vcl_recv.vcl` from this directory in your repo into this section. It should look lik this at the end:
 
 ````  
   ############################################
@@ -173,12 +173,12 @@ Add the contents from `logging-vcl_recv.vcl` from this directory in your repo in
 
 Next, add the logging configuration to the rest of the sections in our VCL:
 
-* `vcl_miss` (`logging-vcl_miss.vcl`)
-* `vcl_pass` (`logging-vcl_pass.vcl`) 
-* `vcl_fetch` (`logging-vcl_fetch.vcl`)
-* `vcl_deliver` (`logging-vcl_deliver.vcl`)
-* `vcl_error` (`logging-vcl_error.vcl`)
-* `vcl_log` (`logging-vcl_log.vcl`)
+* `vcl_miss` (`vcl_miss.vcl`)
+* `vcl_pass` (`vcl_pass.vcl`) 
+* `vcl_fetch` (`vcl_fetch.vcl`)
+* `vcl_deliver` (`vcl_deliver.vcl`)
+* `vcl_error` (`vcl_error.vcl`)
+* `vcl_log` (`vcl_log.vcl`)
 
 ### Step 3: Upload and activate configuration
 
