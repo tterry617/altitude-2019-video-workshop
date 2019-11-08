@@ -339,16 +339,17 @@ It should look like this after adding (*above* our logging configuration):
   ############################################
 ````
 
-Finally, we can add our congestion window changes in `vcl_deliver`. These can be found in the `vod-vcl_deliver.vcl` file. Place this above the logging configuration done previously:
+Finally, we can add our TCP optimisations in `vcl_deliver`. These can be found in the `vod-vcl_deliver.vcl` file. Place this above the logging configuration done previously:
 
 ````
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_deliver CODE HERE
   ############################################
   
-  # increase init cwnd
+  # increase init cwnd and use BBR
   if (client.requests == 1) {
     set client.socket.cwnd = 45;
+    set client.socket.congestion_algorithm = "bbr";
   }
   
   #### vcl_deliver ####
