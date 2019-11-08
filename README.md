@@ -234,7 +234,7 @@ For this, we will use curl with some tweaks to gauge performance.
 In bash, use this command set an alias for curl, with timing indicators and the Fastly debug header to see extra information about the request:
 
 ````
-alias curltest="curl -w '\nLookup time:\t%{time_namelookup}\nConnect time:\t%{time_connect}\nApp Con time:\t%{time_appconnect}\nPreXfer time:\t%{time_pretransfer}\nRedirect time:\t%{time_redirect}\nStartXfer time:\t%{time_starttransfer}\n\nTotal time:\t%{time_total}\n' -svo /dev/null -H 'Fastly-Debug: 1'
+alias curltest="curl -w '\nLookup time:\t%{time_namelookup}\nConnect time:\t%{time_connect}\nApp Con time:\t%{time_appconnect}\nPreXfer time:\t%{time_pretransfer}\nRedirect time:\t%{time_redirect}\nStartXfer time:\t%{time_starttransfer}\n\nTotal time:\t%{time_total}\n' -svo /dev/null -H 'Fastly-Debug: 1'"
 ````
 
 We can then download our video as such (replacing `<num>` with the number of your assigned service.:
