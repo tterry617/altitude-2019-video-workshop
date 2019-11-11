@@ -1,7 +1,33 @@
   #### vcl_log ####
   
+  set req.http.log-timing:log = time.elapsed.usec;
+
+  declare local var.origin_ttfb FLOAT;
+  declare local var.origin_ttlb FLOAT;
+
+  if (fastly_info.state ~ "^(MISS|PASS)") {
+    # origin_ttfb = fetch - misspass
+    set var.origin_ttfb = std.atof(req.http.log-timing:fetch);
+    set var.origin_ttfb -= std.atof(req.http.log-timing:misspass);
+
+    if (req.http.log-timing:do_stream == "1") {
+      # origin_ttlb = log - misspass
+      # (and some clustering)
+      set var.origin_ttlb = std.atof(req.http.log-timing:log);
+      set var.origin_ttlb -= std.atof(req.http.log-timing:misspass);
+    } else {
+      # origin_ttlb = deliver - misspass
+      # (and some clustering)
+      set var.origin_ttlb = std.atof(req.http.log-timing:deliver);
+      set var.origin_ttlb -= std.atof(req.http.log-timing:misspass);
+    }
+  }
+
+  set var.origin_ttfb /= 1000;
+  set var.origin_ttlb /= 1000;
+
   # ttfb = time.to_first_byte (just before deliver)
-  declare local var.response_ttfb FLOAT;
+  declare local var.response_ttfb FLOAT; 
   set var.response_ttfb = time.to_first_byte;
   set var.response_ttfb *= 1000;
 
@@ -34,4 +60,5 @@
   set req.http.log-origin:ttlb = var.origin_ttlb;
   set req.http.log-response:ttfb = var.response_ttfb;
   set req.http.log-response:ttlb = var.response_ttlb;
+
   #################

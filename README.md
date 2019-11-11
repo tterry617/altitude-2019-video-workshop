@@ -107,14 +107,14 @@ You should see a response like this:
 
 ### Step 2: Configure logging endpoint
 
-In this repo you will find a file `logging-log_format.txt`. This is a list of variables we will ne sending to our logging endpoint. We will be url encoding these and uploading them to the Fastly logging API.
+In this repo you will find a file `log_format.txt`. This is a list of variables we will ne sending to our logging endpoint. We will be url encoding these and uploading them to the Fastly logging API.
 
 We are working with Sumo Logic for this workshop, you can use any logging endpoint we support to suit your needs.
 
 In the directory of your git repo, run the following command to configure your real time logs:
 
 ````
-curl -X POST https://api.fastly.com/service/${SERVICE_ID}/version/2/logging/sumologic -H "Fastly-Key: ${API_KEY}" -d@logging-log_format.txt | jq
+curl -X POST https://api.fastly.com/service/${SERVICE_ID}/version/2/logging/sumologic -H "Fastly-Key: ${API_KEY}" -d@log_format.txt | jq
 ````
 
 Sample response:
@@ -153,17 +153,40 @@ In this repo there is included a `main.vcl` file which is our base config. In ea
   ############################################
 ````
 
+<<<<<<< HEAD
 There is also a folder called `workshop-1` which contains our configurations for  logging.
+=======
+There is also a folder called `workshop-1` which contains our configurations for logging. 
+>>>>>>> upstream/master
 
-Add the contents from `logging-vcl_recv.vcl` from this directory in your repo into this section. It should look lik this at the end:
+Add the contents from `vcl_recv.vcl` from this directory in your repo into this section. It should look like this at the end:
 
 ````
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_recv CODE HERE
   ############################################
+<<<<<<< HEAD
 
   # Record number of retrans on the connection
   set req.http.total_retrans = client.socket.tcpi_total_retrans;
+=======
+ 
+  #### vcl_recv ####
+ 
+  set client.geo.ip_override = req.http.fastly-client-ip;
+  set req.http.log-request:host = req.http.host;
+  set req.http.log-request:method = req.method;
+  set req.http.log-request:url = req.url;
+
+  # Grab the GUID
+  if (req.url.path ~ "^/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})") {
+    set req.http.X-Fastly-GUID = re.group.1;
+    set req.url = regsub(req.url,"^/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}","");
+  } else {
+    set req.http.X-Fastly-GUID = "";
+  }
+  ##################
+>>>>>>> upstream/master
 
 
   ############################################
@@ -173,12 +196,21 @@ Add the contents from `logging-vcl_recv.vcl` from this directory in your repo in
 
 Next, add the logging configuration to the rest of the sections in our VCL:
 
+<<<<<<< HEAD
 * `vcl_miss` (`logging-vcl_miss.vcl`)
 * `vcl_pass` (`logging-vcl_pass.vcl`)
 * `vcl_fetch` (`logging-vcl_fetch.vcl`)
 * `vcl_deliver` (`logging-vcl_deliver.vcl`)
 * `vcl_error` (`logging-vcl_error.vcl`)
 * `vcl_log` (`logging-vcl_log.vcl`)
+=======
+* `vcl_miss` (`vcl_miss.vcl`)
+* `vcl_pass` (`vcl_pass.vcl`) 
+* `vcl_fetch` (`vcl_fetch.vcl`)
+* `vcl_deliver` (`vcl_deliver.vcl`)
+* `vcl_error` (`vcl_error.vcl`)
+* `vcl_log` (`vcl_log.vcl`)
+>>>>>>> upstream/master
 
 ### Step 3: Upload and activate configuration
 
@@ -221,7 +253,7 @@ For this, we will use curl with some tweaks to gauge performance.
 In bash, use this command set an alias for curl, with timing indicators and the Fastly debug header to see extra information about the request:
 
 ````
-alias curltest="curl -w '\nLookup time:\t%{time_namelookup}\nConnect time:\t%{time_connect}\nApp Con time:\t%{time_appconnect}\nPreXfer time:\t%{time_pretransfer}\nRedirect time:\t%{time_redirect}\nStartXfer time:\t%{time_starttransfer}\n\nTotal time:\t%{time_total}\n' -svo /dev/null -H 'Fastly-Debug: 1'
+alias curltest="curl -w '\nLookup time:\t%{time_namelookup}\nConnect time:\t%{time_connect}\nApp Con time:\t%{time_appconnect}\nPreXfer time:\t%{time_pretransfer}\nRedirect time:\t%{time_redirect}\nStartXfer time:\t%{time_starttransfer}\n\nTotal time:\t%{time_total}\n' -svo /dev/null -H 'Fastly-Debug: 1'"
 ````
 
 We can then download our video as such (replacing `<num>` with the number of your assigned service.:
@@ -326,16 +358,22 @@ It should look like this after adding (*above* our logging configuration):
   ############################################
 ````
 
-Finally, we can add our congestion window changes in `vcl_deliver`. These can be found in the `vod-vcl_deliver.vcl` file. Place this above the logging configuration done previously:
+Finally, we can add our TCP optimisations in `vcl_deliver`. These can be found in the `vod-vcl_deliver.vcl` file. Place this above the logging configuration done previously:
 
 ````
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_deliver CODE HERE
   ############################################
+<<<<<<< HEAD
 
   # increase init cwnd
+=======
+  
+  # increase init cwnd and use BBR
+>>>>>>> upstream/master
   if (client.requests == 1) {
     set client.socket.cwnd = 45;
+    set client.socket.congestion_algorithm = "bbr";
   }
 
   #### vcl_deliver ####
