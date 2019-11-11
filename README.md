@@ -24,7 +24,7 @@ Fastly documentation:
 * [Workshop 3: Live Optimizations](#workshop3)
 
 <a id="setup"></a>
-## Initial Setup 
+## Initial Setup
 
 In order to ease usage of the API, let's set a few environment variables for our API key and your personal service ID.
 
@@ -40,7 +40,7 @@ export SERVICE_ID=<service_id>
 ````
 
 <a id="tips"></a>
-## General Tips 
+## General Tips
 
 We will be working with an API that returns JSON as its response.
 
@@ -77,7 +77,7 @@ You will receive a JSON response listing all versions. You will want to find the
 You can then clone from your current active version and work from there.
 
 <a id="workshop1"></a>
-## Workshop 1: Visibility and Real Time Log Streaming 
+## Workshop 1: Visibility and Real Time Log Streaming
 
 ### Step 1: Clone service
 
@@ -136,13 +136,13 @@ Sample response:
 }
 ````
 
-### Step 3: Adding our custom logging variables to VCL 
+### Step 3: Adding our custom logging variables to VCL
 
 We will now add custom variable names in our configuration to be sent to our previously configured endpoint.
 
 In this repo there is included a `main.vcl` file which is our base config. In each section where we will be adding code, you will see a block similar to this:
 
-````  
+````
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_recv CODE HERE
   ############################################
@@ -153,15 +153,15 @@ In this repo there is included a `main.vcl` file which is our base config. In ea
   ############################################
 ````
 
-There is also a folder called `workshop-1` which contains our configurations for  logging. 
+There is also a folder called `workshop-1` which contains our configurations for  logging.
 
 Add the contents from `logging-vcl_recv.vcl` from this directory in your repo into this section. It should look lik this at the end:
 
-````  
+````
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_recv CODE HERE
   ############################################
- 
+
   # Record number of retrans on the connection
   set req.http.total_retrans = client.socket.tcpi_total_retrans;
 
@@ -174,7 +174,7 @@ Add the contents from `logging-vcl_recv.vcl` from this directory in your repo in
 Next, add the logging configuration to the rest of the sections in our VCL:
 
 * `vcl_miss` (`logging-vcl_miss.vcl`)
-* `vcl_pass` (`logging-vcl_pass.vcl`) 
+* `vcl_pass` (`logging-vcl_pass.vcl`)
 * `vcl_fetch` (`logging-vcl_fetch.vcl`)
 * `vcl_deliver` (`logging-vcl_deliver.vcl`)
 * `vcl_error` (`logging-vcl_error.vcl`)
@@ -210,7 +210,7 @@ curl -X PUT https://api.fastly.com/service/${SERVICE_ID}/version/2/activate -H "
 ````
 
 <a id="workshop2"></a>
-## Workshop 2: VOD Optimizations 
+## Workshop 2: VOD Optimizations
 
 In this workshop we are testing a progressive download of a video, then adding optimizations a configuration to increase performance of the progressive download.
 
@@ -261,7 +261,7 @@ Now, lets go back to our `workshop1.vcl` file, and start adding our VOD optimiza
 
 You will find a directory called `workshop-2` in your repo, this contains the configuration optimizations for this workshop.
 
-Now, open the file `vod-vcl_fetch.vcl`, and add the VCL into the secion in `vcl_fetch` in your config. 
+Now, open the file `vod-vcl_fetch.vcl`, and add the VCL into the secion in `vcl_fetch` in your config.
 
 In this section, we've added several options.
 
@@ -275,7 +275,7 @@ It should look like this after adding (*above* our logging configuration):
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_fetch CODE HERE
   ############################################
-  
+
   # Set 1s ttl if origin response HTTP status code is anything other than 200 and 206
 
   if (!http_status_matches(beresp.status, "200,206")) {
@@ -299,7 +299,7 @@ It should look like this after adding (*above* our logging configuration):
     # Cache VOD content for 1 year
     set beresp.ttl = 365d;
   }
-  
+
   #### vcl_fetch ####
 
   set beresp.http.log-timing:fetch = time.elapsed.usec;
@@ -320,7 +320,7 @@ It should look like this after adding (*above* our logging configuration):
     set beresp.http.log-origin:shield = server.datacenter;
   }
   ####################
-  
+
   ############################################
   # END VIDEO WORKSHOP
   ############################################
@@ -332,12 +332,12 @@ Finally, we can add our congestion window changes in `vcl_deliver`. These can be
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_deliver CODE HERE
   ############################################
-  
+
   # increase init cwnd
   if (client.requests == 1) {
     set client.socket.cwnd = 45;
   }
-  
+
   #### vcl_deliver ####
 
   set req.http.log-timing:deliver = time.elapsed.usec;
@@ -422,7 +422,7 @@ curl -H "Fastly-Key: ${API_KEY}" -X PUT https://api.fastly.com/service/${SERVICE
 
 Next, use the API to configure a new backend server.
 
-* IP/Hostname: `35.230.111.226`
+* IP/Hostname: `35.237.107.155`
 * Name: `live`
 
 ````
@@ -431,7 +431,7 @@ curl -H "Fastly-Key: ${API_KEY}" -X POST -H "Content-Type: application/x-www-for
 
 ### Step 2: Add live optimizations
 
-Open up your `workshop2.vcl` file again. This time we are working with optimizations from the `workshop3` folder in your repo. In the `vcl_recv` section, add the code from the `live-vcl_recv.vcl` file into the worksop section. 
+Open up your `workshop2.vcl` file again. This time we are working with optimizations from the `workshop3` folder in your repo. In the `vcl_recv` section, add the code from the `live-vcl_recv.vcl` file into the worksop section.
 
 The changes we are making:
 
@@ -449,19 +449,19 @@ It should look like this at the end (with VOD and Live changes:
     set req.http.Host = "storage.googleapis.com";
     set req.http.X-Service = "vod";
   }
-  
+
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_recv CODE HERE
   ############################################
-  
+
   if(req.url.path ~ "^/live") {
     set req.backend = F_live;
     set req.url = regsub(req.url, "/live", "/hls");
     set req.http.X-Service = "live";
   }
-  
+
   ######## vcl_recv ###########
- 
+
   # Record number of retrans on the connection
   set req.http.total_retrans = client.socket.tcpi_total_retrans;
   ###############################
@@ -471,7 +471,7 @@ It should look like this at the end (with VOD and Live changes:
   ############################################
 ````
 
-Next, we'll set caching behavior for our live stream in `vcl_fetch`. Copy the contents of the file `live-vcl_fetch.vcl` and add to the workshop section. 
+Next, we'll set caching behavior for our live stream in `vcl_fetch`. Copy the contents of the file `live-vcl_fetch.vcl` and add to the workshop section.
 
 In this section:
 
@@ -483,7 +483,7 @@ It should end up looking like this:
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_fetch CODE HERE
   ############################################
-  
+
   # Set 1s ttl if origin response HTTP status code is anything other than 200 and 206
 
   if (!http_status_matches(beresp.status, "200,206")) {
@@ -507,7 +507,7 @@ It should end up looking like this:
     # Cache VOD content for 1 year
     set beresp.ttl = 365d;
   }
-  
+
   if(req.http.X-service == "live") {
     # Set 1s ttls for video manifest and 3600s ttls for segments of HTTP Streaming formats.
     # Microsoft Smooth Streaming format manifest and segments do not have file extensions.
@@ -520,7 +520,7 @@ It should end up looking like this:
       }
     }
   }
-  
+
   ############################################
   # END VIDEO WORKSHOP
   ############################################
@@ -549,7 +549,7 @@ Open VLC, and hit command+N (or ctrl-N for windows / linux)
 Add the following URL into the network tab (making sure to update the assigned number to your service):
 
 ````
-https://<num>-videoworkshop.global.ssl.fastly.net/live/stream.m3u8
+https://<num>-videoworkshop.global.ssl.fastly.net/live/altitude.m3u8
 ````
 
 You should see a screen pop up and play the live stream.
