@@ -153,11 +153,9 @@ In this repo there is included a `main.vcl` file which is our base config. In ea
   ############################################
 ````
 
-<<<<<<< HEAD
-There is also a folder called `workshop-1` which contains our configurations for  logging.
-=======
+
 There is also a folder called `workshop-1` which contains our configurations for logging. 
->>>>>>> upstream/master
+
 
 Add the contents from `vcl_recv.vcl` from this directory in your repo into this section. It should look like this at the end:
 
@@ -165,7 +163,7 @@ Add the contents from `vcl_recv.vcl` from this directory in your repo into this 
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_recv CODE HERE
   ############################################
-<<<<<<< HEAD
+
 
   # Record number of retrans on the connection
   set req.http.total_retrans = client.socket.tcpi_total_retrans;
@@ -186,7 +184,6 @@ Add the contents from `vcl_recv.vcl` from this directory in your repo into this 
     set req.http.X-Fastly-GUID = "";
   }
   ##################
->>>>>>> upstream/master
 
 
   ############################################
@@ -196,14 +193,6 @@ Add the contents from `vcl_recv.vcl` from this directory in your repo into this 
 
 Next, add the logging configuration to the rest of the sections in our VCL:
 
-<<<<<<< HEAD
-* `vcl_miss` (`logging-vcl_miss.vcl`)
-* `vcl_pass` (`logging-vcl_pass.vcl`)
-* `vcl_fetch` (`logging-vcl_fetch.vcl`)
-* `vcl_deliver` (`logging-vcl_deliver.vcl`)
-* `vcl_error` (`logging-vcl_error.vcl`)
-* `vcl_log` (`logging-vcl_log.vcl`)
-=======
 * `vcl_miss` (`vcl_miss.vcl`)
 * `vcl_pass` (`vcl_pass.vcl`) 
 * `vcl_fetch` (`vcl_fetch.vcl`)
