@@ -199,7 +199,6 @@ Next, add the logging configuration to the rest of the sections in our VCL:
 * `vcl_deliver` (`vcl_deliver.vcl`)
 * `vcl_error` (`vcl_error.vcl`)
 * `vcl_log` (`vcl_log.vcl`)
->>>>>>> upstream/master
 
 ### Step 3: Upload and activate configuration
 
@@ -353,13 +352,11 @@ Finally, we can add our TCP optimisations in `vcl_deliver`. These can be found i
   ############################################
   # VIDEO WORKSHOP: INSERT vcl_deliver CODE HERE
   ############################################
-<<<<<<< HEAD
 
   # increase init cwnd
 =======
   
   # increase init cwnd and use BBR
->>>>>>> upstream/master
   if (client.requests == 1) {
     set client.socket.cwnd = 45;
     set client.socket.congestion_algorithm = "bbr";
